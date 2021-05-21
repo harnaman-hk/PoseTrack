@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Video Recorder</title>
+    <link rel="stylesheet" href="index.css" type="text/css">
+    <link rel="shortcut icon" type="image/png" href="../icons/16.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  </head>
+  <body>
+  	<div class="container">
+      <table class="header">
+        <tr>
+          <td title="Camera :: Start">
+            <button id="start">
+              <svg width="12" height="12" viewBox="0 0 512 512">
+                <path d="M405.2,232.9L126.8,67.2c-3.4-2-6.9-3.2-10.9-3.2c-10.9,0-19.8,9-19.8,20H96v344h0.1c0,11,8.9,20,19.8,20 c4.1,0,7.5-1.4,11.2-3.4l278.1-165.5c6.6-5.5,10.8-13.8,10.8-23.1C416,246.7,411.8,238.5,405.2,232.9z"/>
+              </svg>
+            </button>
+          </td>
+          <td class="separator">•</td>
+          <td title="Camera :: Stop">
+            <button id="cancel">
+              <svg width="12" height="12" viewBox="0 0 512 512">
+                <rect width="385.03784" height="385.03784" x="63.68" y="63.751587" ry="20.055191"/>
+              </svg>              
+            </button>
+          </td>
+        </tr>
+      </table>
+  	</div>
+    <div class="media"><video id="camera" controls preload="metadata" muted></video></div>
+    <div class="content">
+      <p>List of recorded media (click to download)</p>
+      <div><ul id="list"></ul></div>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
