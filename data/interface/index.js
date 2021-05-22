@@ -1,4 +1,6 @@
 import { processFrames } from '../../processor.js';
+var pred_info = document.getElementById("posture-result");
+var pred_acc = document.getElementById("posture-accuracy");
 
 var config = {
     "count": 0,
@@ -90,11 +92,14 @@ var config = {
 async function processStream() {
     var imgObj = document.getElementById("camera");
     const webcam = await tf.data.webcam(imgObj);
-    
+
     console.log("webcam");
     console.log(webcam);
     try {
-        await processFrames(webcam);
+        var pred = await processFrames(webcam);
+        console.log("final", pred);
+        pred_info.innerHTML = pred[0];
+        pred_acc.innerHTML = pred[1];
     } catch (err) {
         console.log(err);
     }
@@ -106,7 +111,6 @@ var load = function() {
     var cancel = document.getElementById("cancel");
     cancel.disabled = true;
     cancel.style.color = "#555";
-
 
     start.addEventListener("click", async function() {
         if (navigator.mediaDevices) {

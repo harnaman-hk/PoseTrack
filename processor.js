@@ -8,7 +8,7 @@ let toggle = false;
 
 async function init() {
     toggle = true;
-    const modelURL = URL+"/model.json";
+    const modelURL = URL + "/model.json";
     const metadataURL = URL + "/metadata.json";
 
     // load the model and metadata
@@ -16,7 +16,7 @@ async function init() {
     // Note: the pose library adds a tmPose object to your window (window.tmPose)
 
     var model = await tmPose.load(modelURL, metadataURL);
-    
+
     // you need to create File objects, like with file input elements (<input type="file" ...>)
     // const uploadModel = document.getElementById('upload-model');
     // const uploadWeights = document.getElementById('upload-weights');
@@ -56,10 +56,10 @@ async function loop(timestamp) {
     }
 }
 
-async function predict(img,model) {
+async function predict(img, model) {
     // Prediction #1: run input through posenet
     // estimatePose can take in an image, video or canvas html element    
-    img= await img.capture()
+    img = await img.capture()
     console.log(img);
     const {
         pose,
@@ -74,18 +74,18 @@ async function predict(img,model) {
         group.shift();
         group.push(prediction);
     }
-    checkPosture(group);
-    // console.log(group)
-    for (let i = 0; i < maxPredictions; i++) {
-        const classPrediction =
-            prediction[i].className +
-            ": " +
-            prediction[i].probability.toFixed(2);
-        // labelContainer.childNodes[i].innerHTML = classPrediction;
-    }
+    return checkPosture(group);
+    // // console.log(group)
+    // for (let i = 0; i < maxPredictions; i++) {
+    //     const classPrediction =
+    //         prediction[i].className +
+    //         ": " +
+    //         prediction[i].probability.toFixed(2);
+    //     // labelContainer.childNodes[i].innerHTML = classPrediction;
+    // }
 
-    // finally draw the poses
-    drawPose(pose,img);
+    // // finally draw the poses
+    // drawPose(pose, img);
 }
 
 function notifyMe(message) {
@@ -172,6 +172,15 @@ function checkPosture(posturegroup) {
         toggle = false;
         group = [];
         console.log("Correct your posture");
+        return ["Bad Posture", badposture];
+    }
+
+    if (goodposture >= 0.9) {
+        // console.log('bad posture')
+        toggle = false;
+        group = [];
+        console.log("Correct your posture");
+        return ["Good Posture", goodposture];
     }
 
     if (nearscreen >= 0.9) {
@@ -179,19 +188,22 @@ function checkPosture(posturegroup) {
         toggle = false;
         group = [];
         console.log("get away from screen");
+        return ["Too near to the screen", nearscreen];
     }
+
+    return ["inconclusive", 0];
 }
 
-function drawPose(pose,img) {
+function drawPose(pose, img) {
     let mql = window.matchMedia("(max-width: 570px)");
     const size = !mql ? window.innerWidth * 0.6 : window.innerHeight * 0.48;
     const canvas = document.getElementById("canvas");
     canvas.width = !mql ?
-    window.innerWidth * 0.5 :
-    window.innerHeight * 0.45;
+        window.innerWidth * 0.5 :
+        window.innerHeight * 0.45;
     canvas.height = !mql ?
-    window.innerWidth * 0.5 :
-    window.innerHeight * 0.45;
+        window.innerWidth * 0.5 :
+        window.innerHeight * 0.45;
     ctx = canvas.getContext("2d");
     if (img) {
         // ctx.drawImage(img, 10, 10);
@@ -205,6 +217,11 @@ function drawPose(pose,img) {
 }
 
 export async function processFrames(img) {
-    var model=init();
-    model.then((res) => {predict(img,res);});
+    var model = init();
+    return await model.then((res) => {
+        var pred = predict(img, res);
+        return pred.then((res) => {
+            return res;
+        });
+    });
 }
