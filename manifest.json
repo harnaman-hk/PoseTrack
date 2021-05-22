@@ -15,6 +15,9 @@
     "icons": {
         "48": "data/icons/beasts-48.png"
     },
-    "content_security_policy": "script-src 'self' 'unsafe-eval';  object-src 'self' blob:; img-src blob: data:;"
+    "content_security_policy": "script-src 'self' 'unsafe-eval';  object-src 'self' blob:; img-src blob: data:;",
+    "web_accessible_resources": [
+        "model/*"
+    ]
 
 }
