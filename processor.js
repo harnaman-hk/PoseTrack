@@ -31,9 +31,9 @@ async function init() {
     // await webcam.setup(); // request access to the webcam
     // await webcam.play();
 
-    imgObj = document.getElementById("camera");
-    const webcam = await tf.data.webcam(imgObj);
-    window.requestAnimationFrame(loop);
+    // imgObj = document.getElementById("camera");
+    // const webcam = await tf.data.webcam(imgObj);
+    // window.requestAnimationFrame(loop);
 
     // // append/get elements to the DOM
     // const canvas = document.getElementById("canvas");
@@ -61,13 +61,13 @@ async function loop(timestamp) {
     }
 }
 
-async function predict() {
+async function predict(img) {
     // Prediction #1: run input through posenet
     // estimatePose can take in an image, video or canvas html element
     const {
         pose,
         posenetOutput
-    } = await model.estimatePose(webcam.canvas);
+    } = await model.estimatePose(img);
     // Prediction 2: run input through teachable machine classification model
     const prediction = await model.predict(posenetOutput);
     // console.log(group)
@@ -197,6 +197,7 @@ function drawPose(pose) {
     }
 }
 
-export async function processFrames() {
+export async function processFrames(img) {
     init();
+    predict(img);
 }

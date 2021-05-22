@@ -88,18 +88,15 @@ var config = {
 };
 
 async function processStream() {
-    imgObj = document.getElementById("camera");
+    var imgObj = document.getElementById("camera");
     const webcam = await tf.data.webcam(imgObj);
-    modeljson = { "modelTopology": { "class_name": "Sequential", "config": { "name": "sequential_2", "layers": [{ "class_name": "Dense", "config": { "units": 100, "activation": "relu", "use_bias": true, "kernel_initializer": { "class_name": "VarianceScaling", "config": { "scale": 1, "mode": "fan_in", "distribution": "normal", "seed": null } }, "bias_initializer": { "class_name": "Zeros", "config": {} }, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": null, "bias_constraint": null, "name": "dense_Dense1", "trainable": true, "batch_input_shape": [null, 14739], "dtype": "float32" } }, { "class_name": "Dropout", "config": { "rate": 0.5, "noise_shape": null, "seed": null, "name": "dropout_Dropout1", "trainable": true } }, { "class_name": "Dense", "config": { "units": 3, "activation": "softmax", "use_bias": false, "kernel_initializer": { "class_name": "VarianceScaling", "config": { "scale": 1, "mode": "fan_in", "distribution": "normal", "seed": null } }, "bias_initializer": { "class_name": "Zeros", "config": {} }, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": null, "bias_constraint": null, "name": "dense_Dense2", "trainable": true } }] }, "keras_version": "tfjs-layers 1.3.1", "backend": "tensor_flow.js" }, "weightsManifest": [{ "paths": ["weights.bin"], "weights": [{ "name": "dense_Dense1/kernel", "shape": [14739, 100], "dtype": "float32" }, { "name": "dense_Dense1/bias", "shape": [100], "dtype": "float32" }, { "name": "dense_Dense2/kernel", "shape": [100, 3], "dtype": "float32" }] }] };
-    modelmeta = { "tfjsVersion": "1.3.1", "tmVersion": "0.8.6", "packageVersion": "0.8.6", "packageName": "@teachablemachine/pose", "timeStamp": "2020-11-21T18:30:15.108Z", "userMetadata": {}, "modelName": "my-pose-model", "labels": ["good posture", "bad posture", "near screen"], "modelSettings": { "posenet": { "architecture": "MobileNetV1", "outputStride": 16, "inputResolution": 257, "multiplier": 0.75 } } };
-    // try {
-
-    //     const model = await tf.loadLayersModel(modeljson);
-    // } catch (err) {
-    //     console.log(err);
-    // }
-    // console.log("webcam");
-    // console.log(webcam);
+    console.log("webcam");
+    console.log(webcam);
+    try {
+        await processFrames(webcam);
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 var load = function() {
@@ -160,8 +157,8 @@ window.addEventListener("resize", function() {
 
 window.addEventListener("load", async() => {
     load();
-    // processStream();
-    processFrames();
+    processStream();
+    // processFrames();
 }, false);
 // const webcamElement = document.getElementById('webcam');
 // const classifier = knnClassifier.create();
