@@ -1,6 +1,6 @@
 console.log("Ready");
 
-const URL = "./model/model.json";
+const URL = "../../model";
 let model, webcam, ctx, labelContainer, maxPredictions;
 
 let group = [];
@@ -8,7 +8,7 @@ let toggle = false;
 
 async function init() {
     toggle = true;
-    const modelURL = URL;
+    const modelURL = URL+"/model.json";
     const metadataURL = URL + "/metadata.json";
 
     // load the model and metadata
@@ -16,6 +16,7 @@ async function init() {
     // Note: the pose library adds a tmPose object to your window (window.tmPose)
 
     model = await tmPose.load(modelURL, metadataURL);
+    
     // you need to create File objects, like with file input elements (<input type="file" ...>)
     // const uploadModel = document.getElementById('upload-model');
     // const uploadWeights = document.getElementById('upload-weights');
@@ -63,7 +64,10 @@ async function loop(timestamp) {
 
 async function predict(img) {
     // Prediction #1: run input through posenet
-    // estimatePose can take in an image, video or canvas html element
+    // estimatePose can take in an image, video or canvas html element    
+    img= await img.capture()
+    console.log(img);
+    console.log(model.estimatePose);
     const {
         pose,
         posenetOutput

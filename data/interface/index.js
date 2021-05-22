@@ -90,6 +90,7 @@ var config = {
 async function processStream() {
     var imgObj = document.getElementById("camera");
     const webcam = await tf.data.webcam(imgObj);
+    
     console.log("webcam");
     console.log(webcam);
     try {
