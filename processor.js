@@ -1,7 +1,7 @@
 console.log("Ready");
 
 const URL = "../../model";
-let model, webcam, ctx, labelContainer, maxPredictions;
+var webcam, ctx, labelContainer, maxPredictions;
 
 let group = [];
 let toggle = false;
@@ -15,7 +15,7 @@ async function init() {
     // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
     // Note: the pose library adds a tmPose object to your window (window.tmPose)
 
-    model = await tmPose.load(modelURL, metadataURL);
+    var model = await tmPose.load(modelURL, metadataURL);
     
     // you need to create File objects, like with file input elements (<input type="file" ...>)
     // const uploadModel = document.getElementById('upload-model');
@@ -37,37 +37,30 @@ async function init() {
     // window.requestAnimationFrame(loop);
 
     // // append/get elements to the DOM
-    // const canvas = document.getElementById("canvas");
-    // canvas.width = !mql ?
-    //     window.innerWidth * 0.5 :
-    //     window.innerHeight * 0.45;
-    // canvas.height = !mql ?
-    //     window.innerWidth * 0.5 :
-    //     window.innerHeight * 0.45;
-    // ctx = canvas.getContext("2d");
+
     // labelContainer = document.getElementById("label-container");
     // for (let i = 0; i < maxPredictions; i++) {
     //     // and class labels
     //     labelContainer.appendChild(document.createElement("div"));
     // }
+    console.log(model);
+    return model;
 }
 
 async function loop(timestamp) {
     console.log(timestamp);
     webcam.update(); // update the webcam frame
-
     await predict();
     if (toggle) {
         window.requestAnimationFrame(loop);
     }
 }
 
-async function predict(img) {
+async function predict(img,model) {
     // Prediction #1: run input through posenet
     // estimatePose can take in an image, video or canvas html element    
     img= await img.capture()
     console.log(img);
-    console.log(model.estimatePose);
     const {
         pose,
         posenetOutput
@@ -92,7 +85,7 @@ async function predict(img) {
     }
 
     // finally draw the poses
-    drawPose(pose);
+    drawPose(pose,img);
 }
 
 function notifyMe(message) {
@@ -148,17 +141,17 @@ function notifyMe(message) {
 function checkPosture(posturegroup) {
     //group
     console.log(group);
-    goodposture = (
+    var goodposture = (
         posturegroup.reduce((sum, data) => {
             return sum + data[0].probability;
         }, 0) / 100
     ).toFixed(3);
-    badposture = (
+    var badposture = (
         posturegroup.reduce((sum, data) => {
             return sum + data[1].probability;
         }, 0) / 100
     ).toFixed(3);
-    nearscreen = (
+    var nearscreen = (
         posturegroup.reduce((sum, data) => {
             return sum + data[2].probability;
         }, 0) / 100
@@ -189,9 +182,19 @@ function checkPosture(posturegroup) {
     }
 }
 
-function drawPose(pose) {
-    if (webcam.canvas) {
-        ctx.drawImage(webcam.canvas, 0, 0);
+function drawPose(pose,img) {
+    let mql = window.matchMedia("(max-width: 570px)");
+    const size = !mql ? window.innerWidth * 0.6 : window.innerHeight * 0.48;
+    const canvas = document.getElementById("canvas");
+    canvas.width = !mql ?
+    window.innerWidth * 0.5 :
+    window.innerHeight * 0.45;
+    canvas.height = !mql ?
+    window.innerWidth * 0.5 :
+    window.innerHeight * 0.45;
+    ctx = canvas.getContext("2d");
+    if (img) {
+        // ctx.drawImage(img, 10, 10);
         // draw the keypoints and skeleton
         if (pose) {
             const minPartConfidence = 0.5;
@@ -202,6 +205,6 @@ function drawPose(pose) {
 }
 
 export async function processFrames(img) {
-    init();
-    predict(img);
+    var model=init();
+    model.then((res) => {predict(img,res);});
 }
