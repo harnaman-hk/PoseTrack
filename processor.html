@@ -5,12 +5,20 @@
     <script src="lib/bootstrap.min.js"></script>
     <script src="lib/tf.min.js.map"></script>
     <script src="lib/teachable.min.js"></script>
-    <script src="processor.js" async defer></script>
+    <script src="processor.js" type="module" async defer></script>
 </head>
 
 <body>
-    Wingman Jr. creates a test page for processing that is usually hidden. Specifically, it needs to make a "real" page so that the AI can properly use your graphics card to its full potential! If you unhide and close this page, processing will break for
-    Wingman Jr.
+    <h3>PoseTrack adds this tab to utilise your webcam. To continue using PoseTrack, do not close this tab.</h3>
+    <div class="media"><video id="camera" controls preload="metadata" muted></video></div>
+    <div class="content">
+        <p>Posture History</p>
+        <div>
+            <p class="col-sm-6" id="posture-result"></p>
+            <p class="col-sm-6" id="posture-accuracy"></p>
+        </div>
+    </div>
+    <canvas id="canvas "></canvas>
 </body>
 
 </html>

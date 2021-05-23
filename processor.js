@@ -1,3 +1,6 @@
+export async function stopProcessing() {
+    stream.getTracks().forEach(function(track) { track.stop(); });
+}
 console.log("Ready");
 
 const URL = "../../model";
@@ -47,15 +50,6 @@ async function init() {
     return model;
 }
 
-async function loop(timestamp) {
-    console.log(timestamp);
-    webcam.update(); // update the webcam frame
-    await predict();
-    if (toggle) {
-        window.requestAnimationFrame(loop);
-    }
-}
-
 async function predict(img, model) {
     // Prediction #1: run input through posenet
     // estimatePose can take in an image, video or canvas html element    
@@ -88,56 +82,6 @@ async function predict(img, model) {
     // drawPose(pose, img);
 }
 
-function notifyMe(message) {
-    // Let's check if the browser supports notifications
-    const startover = function() {
-        // console.log('NOTIFICATION CLICKed')
-        toggle = true;
-        // console.log(toggle)
-        window.requestAnimationFrame(loop);
-        group = [];
-    };
-    if (!("Notification" in window)) {
-        alert("This browser does not support desktop notification");
-    }
-
-    // Let's check whether notification permissions have already been granted
-    else if (Notification.permission === "granted") {
-        // If it's okay let's create a notification
-        var title = "Posture";
-        var icon =
-            "https://homepages.cae.wisc.edu/~ece533/images/airplane.png";
-        var body =
-            message + ". Please sit in correctly and click this notification";
-        var tag = "pose-bot";
-        var notification = new Notification(title, {
-            body,
-            icon,
-            tag
-        });
-    }
-
-    // Otherwise, we need to ask the user for permission
-    else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(function(permission) {
-            // If the user accepts, let's create a notification
-            if (permission === "granted") {
-                var notification = new Notification(title, {
-                    body,
-                    icon,
-                    tag
-                });
-            }
-        });
-    }
-
-    notification.onclick = startover;
-    notification.onclose = startover;
-
-    // At last, if the user has denied notifications, and you
-    // want to be respectful there is no need to bother them any more.
-}
-
 function checkPosture(posturegroup) {
     //group
     console.log(posturegroup);
@@ -159,8 +103,6 @@ function checkPosture(posturegroup) {
     ).toFixed(3);
 
     console.log('good: ', goodposture, ' bad: ', badposture)
-        // document.getElementById('good').innerHTML = 'Good: ' + goodposture
-        // document.getElementById('bad').innerHTML = 'Bad: ' + badposture
 
     console.log({
         goodposture,
@@ -217,13 +159,66 @@ function drawPose(pose, img) {
     }
 }
 
-export async function processFrames(img) {
+async function processFrames(img) {
     var model = init();
     return await model.then((res) => {
         var pred = predict(img, res);
         return pred.then((res) => {
+            var gettingCookies = browser.cookies.get({
+                url: "postrack.cookie",
+                name: "posture_records"
+            });
+            gettingCookies.then((cookie) => {
+                if (cookie)
+                    console.log("yayy");
+                // console.log(cookie);
+                // console.log(JSON.parse(cookie.value));
+            });
             browser.runtime.sendMessage({ "text": res[0] });
             return res;
         });
     });
 }
+
+// processor.html
+let stream;
+var player = document.getElementById("camera");
+var pred_info = document.getElementById("posture-result");
+var pred_acc = document.getElementById("posture-accuracy");
+
+async function processStream() {
+    var imgObj = document.getElementById("camera");
+    const webcam = await tf.data.webcam(imgObj);
+
+    console.log("webcam");
+    console.log(webcam);
+    try {
+        var pred = await processFrames(webcam);
+        console.log("final", pred);
+        pred_info.innerHTML = pred[0];
+        pred_acc.innerHTML = pred[1];
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+var loadMedia = async function() {
+    if (navigator.mediaDevices) {
+        navigator.mediaDevices.getUserMedia({ "video": true, "audio": true }).then(function(e) {
+            stream = e;
+            player.srcObject = stream;
+            player.play();
+
+            // work on prediction
+            // imgObj = document.getElementById("camera");
+            // const webcam = await tf.data.webcam(imgObj);
+            // console.log(webcam);
+            console.log(stream);
+            processStream();
+
+        }).catch(function(e) { console.log("get media error", e) });
+    } else console.error("navigator.mediaDevices is not available!");
+}
+
+
+window.addEventListener("load", loadMedia, false);

@@ -1,15 +1,10 @@
 {
     "version": "0.1",
     "manifest_version": 2,
-    "offline_enabled": true,
     "name": "PoseTrack",
     "short_name": "posture-tracker",
-    "permissions": ["storage", "downloads", "notifications"],
+    "permissions": ["storage", "downloads", "cookies", "notifications", "<all_urls>"],
     "background": { "scripts": ["lib/background.js"] },
-    "content_scripts": [{
-        "matches": ["<all_urls>"],
-        "js": ["processor.js"]
-    }],
     "homepage_url": "https://github.com/harnaman-hk/PoseTrack",
     "description": "In these times of online-ed and work from home, we have been sitting for a long duration besides our laptop screen without much thinking about the adverse consequences wrong sitting posture can have on our health. So we came up with an idea to tackle this problem. With the help of a webcam and trained data that would guide us to maintain a healthy posture. We are creating an web extension/app that keeps an eye on us and pings us when the posture is not maintained!",
     "browser_action": {
