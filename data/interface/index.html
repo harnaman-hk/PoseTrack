@@ -14,9 +14,16 @@
 </head>
 
 <body>
-    <div class="col-lg-12 justify-content center">
-        <button id="cancelstream">Stop PoseTrack</button>
+    <div class="media"><video id="camera" controls preload="metadata" muted></video></div>
+    <div class="labelContainer"></div>
+    <div class="content">
+        <p>Posture History</p>
+        <div>
+            <p class="col-sm-6" id="posture-result"></p>
+            <p class="col-sm-6" id="posture-accuracy"></p>
+        </div>
     </div>
+    <canvas id="canvas"></canvas>
     <script src="index.js " type="module" async defer></script>
 </body>
 
