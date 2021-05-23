@@ -4,7 +4,7 @@ export async function stopProcessing() {
 
 console.log("Ready");
 const URL = "../../model";
-let  webcam, ctx, labelContainer, maxPredictions;
+let webcam, ctx, labelContainer, maxPredictions;
 
 let group = [];
 let toggle = false;
@@ -60,7 +60,7 @@ async function loop(model) {
 
     await predict(model);
     if (toggle) {
-        loop(model);    
+        loop(model);
         // window.requestAnimationFrame(loop);
     }
 }
@@ -84,7 +84,7 @@ async function predict(model) {
         group.push(prediction);
     }
     checkPosture(group);
-    var labelContainer=document.getElementsByClassName("labelContainer");
+    var labelContainer = document.getElementsByClassName("labelContainer");
     // console.log(group)
     for (let i = 0; i < maxPredictions; i++) {
         const classPrediction =
@@ -127,6 +127,13 @@ function checkPosture(posturegroup) {
         badposture,
         nearscreen
     });
+
+    if (goodposture >= 0.9) {
+        // console.log('bad posture')
+        toggle = false;
+        group = [];
+        console.log("Gooooooooood posture");
+    }
 
     if (badposture >= 0.9) {
         // console.log('bad posture')
