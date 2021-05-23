@@ -152,9 +152,9 @@ span {
   overflow-y: auto;
   max-height: calc(100vh - 440px);
   /* background: url('../icons/128.png') no-repeat center center; */
-  background-size: 64px;
-/* } */
- */
+  /* background-size: 64px;
+} */
+ 
 
 .separator {
   width: 16px;

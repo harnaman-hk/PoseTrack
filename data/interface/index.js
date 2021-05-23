@@ -76,7 +76,7 @@ async function predict(model) {
             ": " +
             prediction[i].probability.toFixed(2);
 
-        console.log(classPrediction);
+        // console.log(classPrediction);
     }
 
 }
@@ -127,7 +127,7 @@ function checkPosture(posturegroup) {
 
     if (nearscreen >= 0.9) {
         // console.log('bad posture')
-        toggle = false;
+        toggle = true;
         group = [];
         // console.log("get away from screen");
         pred_info.innerHTML = "Too near to the screen";
@@ -135,7 +135,7 @@ function checkPosture(posturegroup) {
     var prog=document.getElementById('progBar');
     // prog.val(goodposture*100);
     console.log(goodposture*100);
-    prog.setAttribute(value,goodposture*100)
+    prog.value=goodposture*100;
     // toggle = true;
     // loop(model);
 }

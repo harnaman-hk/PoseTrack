@@ -17,14 +17,13 @@
     <div class="media box"><video id="camera" controls preload="metadata" muted></video></div>
     <div class="labelContainer"></div>
 
-    <input type="button" id="click" value="Posture" label="Posture"/>
-    <progress id="progBar" value="0" max="100" />
-        <p>Posture Log</p>
+    
+        <!-- <p>Posture Log</p> -->
         <div>
-            <p class="col-sm-6" id="posture-result"></p>
-            <p class="col-sm-6" id="posture-accuracy"></p>
+            <p class="col-sm-6" id="posture-result" style="text-align:center">Wait for a while, the slider tracks the goodness of your posture!</p>
+            <!-- <p class="col-sm-6" id="posture-accuracy"></p> -->
         </div>
-
+    <progress id="progBar" class="   mx-auto  " value="0" max="100" style="height: 50px;width: 300px; margin-left: 250px;"/>
     <canvas id="canvas">
     </canvas>
     <div class="info">
