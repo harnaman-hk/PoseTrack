@@ -74,15 +74,15 @@ async function predict(img, model) {
         group.shift();
         group.push(prediction);
     }
+    console.log(group)
+    for (let i = 0; i < maxPredictions; i++) {
+        const classPrediction =
+            prediction[i].className +
+            ": " +
+            prediction[i].probability.toFixed(2);
+        // labelContainer.childNodes[i].innerHTML = classPrediction;
+    }
     return checkPosture(group);
-    // // console.log(group)
-    // for (let i = 0; i < maxPredictions; i++) {
-    //     const classPrediction =
-    //         prediction[i].className +
-    //         ": " +
-    //         prediction[i].probability.toFixed(2);
-    //     // labelContainer.childNodes[i].innerHTML = classPrediction;
-    // }
 
     // // finally draw the poses
     // drawPose(pose, img);
@@ -140,9 +140,10 @@ function notifyMe(message) {
 
 function checkPosture(posturegroup) {
     //group
-    console.log(group);
+    console.log(posturegroup);
     var goodposture = (
         posturegroup.reduce((sum, data) => {
+            console.log(sum, data);
             return sum + data[0].probability;
         }, 0) / 100
     ).toFixed(3);
@@ -221,6 +222,7 @@ export async function processFrames(img) {
     return await model.then((res) => {
         var pred = predict(img, res);
         return pred.then((res) => {
+            browser.runtime.sendMessage({ "text": res[0] });
             return res;
         });
     });
