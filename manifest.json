@@ -19,6 +19,5 @@
     "web_accessible_resources": [
         "model/*",
         "data/icons/*"
-    ],
-    "default_locale": "en"
+    ]
 }
