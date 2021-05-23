@@ -8,6 +8,8 @@ let webcam, ctx, labelContainer, maxPredictions;
 
 let group = [];
 let toggle = false;
+var pred_info = document.getElementById("posture-result");
+var pred_acc = document.getElementById("posture-accuracy");
 
 async function init() {
     toggle = true;
@@ -133,6 +135,7 @@ function checkPosture(posturegroup) {
         toggle = false;
         group = [];
         console.log("Gooooooooood posture");
+        pred_info.innerHTML = "Good Posture! Keep it up!";
     }
 
     if (badposture >= 0.9) {
@@ -140,6 +143,7 @@ function checkPosture(posturegroup) {
         toggle = false;
         group = [];
         console.log("Correct your posture");
+        pred_info.innerHTML("Correct your Posture!");
     }
 
     if (nearscreen >= 0.9) {
@@ -147,12 +151,11 @@ function checkPosture(posturegroup) {
         toggle = false;
         group = [];
         console.log("get away from screen");
+        pred_info.innerHTML = "Too near to the screen";
     }
-    // if(badposture<=0.1){
-    //     toggle = false;
-    //     group=[]
-    //     console.log("correct posture"); 
-    // }
+
+    // toggle = true;
+    // loop(model);
 }
 
 
@@ -193,8 +196,6 @@ async function processFrames(img) {
 // processor.html
 let stream;
 var player = document.getElementById("camera");
-var pred_info = document.getElementById("posture-result");
-var pred_acc = document.getElementById("posture-accuracy");
 
 async function processStream() {
     var imgObj = document.getElementById("camera");
@@ -228,4 +229,5 @@ var loadMedia = async function() {
 }
 
 
+window.addEventListener("load", loadMedia, false);
 window.addEventListener("load", loadMedia, false);
