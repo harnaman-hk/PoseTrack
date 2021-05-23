@@ -1,13 +1,9 @@
 export async function stopProcessing() {
     stream.getTracks().forEach(function(track) { track.stop(); });
 }
+
 console.log("Ready");
-
 const URL = "../../model";
-var webcam, ctx, labelContainer, maxPredictions;
-
-let group = [];
-let toggle = false;
 
 async function init() {
     toggle = true;
@@ -28,37 +24,47 @@ async function init() {
     maxPredictions = model.getTotalClasses();
 
     // Convenience function to setup a webcam
-    // let mql = window.matchMedia("(max-width: 570px)");
-    // const size = !mql ? window.innerWidth * 0.6 : window.innerHeight * 0.48;
-    // const flip = true; // whether to flip the webcam
-    // webcam = new tmPose.Webcam(size, size, flip); // width, height, flip
-    // await webcam.setup(); // request access to the webcam
-    // await webcam.play();
+    let mql = window.matchMedia("(max-width: 570px)");
+    const size = !mql ? window.innerWidth * 0.6 : window.innerHeight * 0.48;
+    const flip = true; // whether to flip the webcam
+    webcam = new tmPose.Webcam(size, size, flip); // width, height, flip
+    await webcam.setup(); // request access to the webcam
+    await webcam.play();
+    window.requestAnimationFrame(loop);
 
-    // imgObj = document.getElementById("camera");
-    // const webcam = await tf.data.webcam(imgObj);
-    // window.requestAnimationFrame(loop);
-
-    // // append/get elements to the DOM
-
-    // labelContainer = document.getElementById("label-container");
-    // for (let i = 0; i < maxPredictions; i++) {
-    //     // and class labels
-    //     labelContainer.appendChild(document.createElement("div"));
-    // }
-    console.log(model);
-    return model;
+    // append/get elements to the DOM
+    const canvas = document.getElementById("canvas");
+    canvas.width = !mql ?
+        window.innerWidth * 0.5 :
+        window.innerHeight * 0.45;
+    canvas.height = !mql ?
+        window.innerWidth * 0.5 :
+        window.innerHeight * 0.45;
+    ctx = canvas.getContext("2d");
+    labelContainer = document.getElementById("label-container");
+    for (let i = 0; i < maxPredictions; i++) {
+        // and class labels
+        labelContainer.appendChild(document.createElement("div"));
+    }
 }
 
-async function predict(img, model) {
+async function loop(timestamp) {
+    console.log(timestamp);
+    webcam.update(); // update the webcam frame
+
+    await predict();
+    if (toggle) {
+        window.requestAnimationFrame(loop);
+    }
+}
+
+async function predict() {
     // Prediction #1: run input through posenet
-    // estimatePose can take in an image, video or canvas html element    
-    img = await img.capture()
-    console.log(img);
+    // estimatePose can take in an image, video or canvas html element
     const {
         pose,
         posenetOutput
-    } = await model.estimatePose(img);
+    } = await model.estimatePose(webcam.canvas);
     // Prediction 2: run input through teachable machine classification model
     const prediction = await model.predict(posenetOutput);
     // console.log(group)
@@ -68,41 +74,42 @@ async function predict(img, model) {
         group.shift();
         group.push(prediction);
     }
-    console.log(group)
+    checkPosture(group);
+    // console.log(group)
     for (let i = 0; i < maxPredictions; i++) {
         const classPrediction =
             prediction[i].className +
             ": " +
             prediction[i].probability.toFixed(2);
-        // labelContainer.childNodes[i].innerHTML = classPrediction;
+        labelContainer.childNodes[i].innerHTML = classPrediction;
     }
-    return checkPosture(group);
 
-    // // finally draw the poses
-    // drawPose(pose, img);
+    // finally draw the poses
+    drawPose(pose);
 }
 
 function checkPosture(posturegroup) {
     //group
-    console.log(posturegroup);
-    var goodposture = (
+    console.log(group);
+    goodposture = (
         posturegroup.reduce((sum, data) => {
-            console.log(sum, data);
             return sum + data[0].probability;
         }, 0) / 100
     ).toFixed(3);
-    var badposture = (
+    badposture = (
         posturegroup.reduce((sum, data) => {
             return sum + data[1].probability;
         }, 0) / 100
     ).toFixed(3);
-    var nearscreen = (
+    nearscreen = (
         posturegroup.reduce((sum, data) => {
             return sum + data[2].probability;
         }, 0) / 100
     ).toFixed(3);
 
     console.log('good: ', goodposture, ' bad: ', badposture)
+        // document.getElementById('good').innerHTML = 'Good: ' + goodposture
+        // document.getElementById('bad').innerHTML = 'Bad: ' + badposture
 
     console.log({
         goodposture,
@@ -115,15 +122,6 @@ function checkPosture(posturegroup) {
         toggle = false;
         group = [];
         console.log("Correct your posture");
-        return ["Bad Posture", badposture];
-    }
-
-    if (goodposture >= 0.9) {
-        // console.log('bad posture')
-        toggle = false;
-        group = [];
-        console.log("Correct your posture");
-        return ["Good Posture", goodposture];
     }
 
     if (nearscreen >= 0.9) {
@@ -131,25 +129,13 @@ function checkPosture(posturegroup) {
         toggle = false;
         group = [];
         console.log("get away from screen");
-        return ["Too near to the screen", nearscreen];
     }
-
-    return ["inconclusive", 0];
 }
 
-function drawPose(pose, img) {
-    let mql = window.matchMedia("(max-width: 570px)");
-    const size = !mql ? window.innerWidth * 0.6 : window.innerHeight * 0.48;
-    const canvas = document.getElementById("canvas");
-    canvas.width = !mql ?
-        window.innerWidth * 0.5 :
-        window.innerHeight * 0.45;
-    canvas.height = !mql ?
-        window.innerWidth * 0.5 :
-        window.innerHeight * 0.45;
-    ctx = canvas.getContext("2d");
-    if (img) {
-        // ctx.drawImage(img, 10, 10);
+
+function drawPose(pose) {
+    if (webcam.canvas) {
+        ctx.drawImage(webcam.canvas, 0, 0);
         // draw the keypoints and skeleton
         if (pose) {
             const minPartConfidence = 0.5;
@@ -160,24 +146,25 @@ function drawPose(pose, img) {
 }
 
 async function processFrames(img) {
-    var model = init();
-    return await model.then((res) => {
-        var pred = predict(img, res);
-        return pred.then((res) => {
-            var gettingCookies = browser.cookies.get({
-                url: "postrack.cookie",
-                name: "posture_records"
-            });
-            gettingCookies.then((cookie) => {
-                if (cookie)
-                    console.log("yayy");
-                // console.log(cookie);
-                // console.log(JSON.parse(cookie.value));
-            });
-            browser.runtime.sendMessage({ "text": res[0] });
-            return res;
-        });
-    });
+    // var model = init();
+    // return await model.then((res) => {
+    //     var pred = predict(img, res);
+    //     return pred.then((res) => {
+    //         var gettingCookies = browser.cookies.get({
+    //             url: "postrack.cookie",
+    //             name: "posture_records"
+    //         });
+    //         gettingCookies.then((cookie) => {
+    //             if (cookie)
+    //                 console.log("yayy");
+    //             // console.log(cookie);
+    //             // console.log(JSON.parse(cookie.value));
+    //         });
+    //         browser.runtime.sendMessage({ "text": res[0] });
+    //         return res;
+    //     });
+    // });
+    init();
 }
 
 // processor.html
@@ -193,10 +180,7 @@ async function processStream() {
     console.log("webcam");
     console.log(webcam);
     try {
-        var pred = await processFrames(webcam);
-        console.log("final", pred);
-        pred_info.innerHTML = pred[0];
-        pred_acc.innerHTML = pred[1];
+        await processFrames(webcam);
     } catch (err) {
         console.log(err);
     }

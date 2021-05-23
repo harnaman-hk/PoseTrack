@@ -5,12 +5,14 @@
     <script src="lib/bootstrap.min.js"></script>
     <script src="lib/tf.min.js.map"></script>
     <script src="lib/teachable.min.js"></script>
+    <!-- <script src="global.js"></script> -->
     <script src="processor.js" type="module" async defer></script>
 </head>
 
 <body>
     <h3>PoseTrack adds this tab to utilise your webcam. To continue using PoseTrack, do not close this tab.</h3>
     <div class="media"><video id="camera" controls preload="metadata" muted></video></div>
+    <div class="labelContainer"></div>
     <div class="content">
         <p>Posture History</p>
         <div>
@@ -18,7 +20,7 @@
             <p class="col-sm-6" id="posture-accuracy"></p>
         </div>
     </div>
-    <canvas id="canvas "></canvas>
+    <canvas id="canvas"></canvas>
 </body>
 
 </html>
