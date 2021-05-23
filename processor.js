@@ -4,6 +4,10 @@ export async function stopProcessing() {
 
 console.log("Ready");
 const URL = "../../model";
+let  webcam, ctx, labelContainer, maxPredictions;
+
+let group = [];
+let toggle = false;
 
 async function init() {
     toggle = true;
@@ -15,6 +19,7 @@ async function init() {
     // Note: the pose library adds a tmPose object to your window (window.tmPose)
 
     var model = await tmPose.load(modelURL, metadataURL);
+    console.log(model.estimatePose);
 
     // you need to create File objects, like with file input elements (<input type="file" ...>)
     // const uploadModel = document.getElementById('upload-model');
@@ -30,7 +35,8 @@ async function init() {
     webcam = new tmPose.Webcam(size, size, flip); // width, height, flip
     await webcam.setup(); // request access to the webcam
     await webcam.play();
-    window.requestAnimationFrame(loop);
+    loop(model);
+    // window.requestAnimationFrame(loop);
 
     // append/get elements to the DOM
     const canvas = document.getElementById("canvas");
@@ -48,19 +54,22 @@ async function init() {
     }
 }
 
-async function loop(timestamp) {
-    console.log(timestamp);
+async function loop(model) {
+    // console.log(timestamp);
     webcam.update(); // update the webcam frame
 
-    await predict();
+    await predict(model);
     if (toggle) {
-        window.requestAnimationFrame(loop);
+        loop(model);    
+        // window.requestAnimationFrame(loop);
     }
 }
 
-async function predict() {
+async function predict(model) {
     // Prediction #1: run input through posenet
     // estimatePose can take in an image, video or canvas html element
+    console.log(model.estimatePose);
+    console.log(webcam);
     const {
         pose,
         posenetOutput
@@ -75,33 +84,35 @@ async function predict() {
         group.push(prediction);
     }
     checkPosture(group);
+    var labelContainer=document.getElementsByClassName("labelContainer");
     // console.log(group)
     for (let i = 0; i < maxPredictions; i++) {
         const classPrediction =
             prediction[i].className +
             ": " +
             prediction[i].probability.toFixed(2);
-        labelContainer.childNodes[i].innerHTML = classPrediction;
+        // labelContainer.childNodes[i].innerHTML = classPrediction;
+        console.log(classPrediction);
     }
 
     // finally draw the poses
-    drawPose(pose);
+    // drawPose(pose);
 }
 
 function checkPosture(posturegroup) {
     //group
     console.log(group);
-    goodposture = (
+    var goodposture = (
         posturegroup.reduce((sum, data) => {
             return sum + data[0].probability;
         }, 0) / 100
     ).toFixed(3);
-    badposture = (
+    var badposture = (
         posturegroup.reduce((sum, data) => {
             return sum + data[1].probability;
         }, 0) / 100
     ).toFixed(3);
-    nearscreen = (
+    var nearscreen = (
         posturegroup.reduce((sum, data) => {
             return sum + data[2].probability;
         }, 0) / 100
@@ -130,6 +141,11 @@ function checkPosture(posturegroup) {
         group = [];
         console.log("get away from screen");
     }
+    // if(badposture<=0.1){
+    //     toggle = false;
+    //     group=[]
+    //     console.log("correct posture"); 
+    // }
 }
 
 
