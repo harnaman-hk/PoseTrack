@@ -132,10 +132,14 @@ function checkPosture(posturegroup) {
         // console.log("get away from screen");
         pred_info.innerHTML = "Too near to the screen";
     }
-
+    var prog=document.getElementById('progBar');
+    // prog.val(goodposture*100);
+    console.log(goodposture*100);
+    prog.setAttribute(value,goodposture*100)
     // toggle = true;
     // loop(model);
 }
+
 
 
 function drawPose(pose) {

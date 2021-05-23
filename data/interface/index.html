@@ -14,16 +14,22 @@
 </head>
 
 <body>
-    <div class="media"><video id="camera" controls preload="metadata" muted></video></div>
+    <div class="media box"><video id="camera" controls preload="metadata" muted></video></div>
     <div class="labelContainer"></div>
-    <div class="content">
-        <p>Posture History</p>
+
+    <input type="button" id="click" value="Posture" label="Posture"/>
+    <progress id="progBar" value="0" max="100" />
+        <p>Posture Log</p>
         <div>
             <p class="col-sm-6" id="posture-result"></p>
             <p class="col-sm-6" id="posture-accuracy"></p>
         </div>
+
+    <canvas id="canvas">
+    </canvas>
+    <div class="info">
+        For Tips on maintaining your posture, Please click<a href="https://www.ergonomics.com.au/how-to-sit-at-a-computer/">here</a> .
     </div>
-    <canvas id="canvas"></canvas>
     <script src="index.js " type="module" async defer></script>
 </body>
 

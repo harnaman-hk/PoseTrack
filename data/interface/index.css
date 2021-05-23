@@ -146,14 +146,15 @@ span {
   margin: 0 auto;
   background-color: #71A0A5;
 }
-
+/* 
 .content div {
   height: 100vh;
   overflow-y: auto;
   max-height: calc(100vh - 440px);
   /* background: url('../icons/128.png') no-repeat center center; */
   background-size: 64px;
-}
+/* } */
+ */
 
 .separator {
   width: 16px;
@@ -192,4 +193,9 @@ html[context="webapp"] .toolbar {
   .extra, .toolbar, .separator {
     display: none;
   }
+}
+
+.box{
+    min-height: 400px;
+    min-width: 800px;
 }
